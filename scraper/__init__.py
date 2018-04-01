@@ -2,34 +2,47 @@ import os
 import subprocess
 import sys
 import tempfile
+from pathlib import Path
+
+from lxml.html import document_fromstring, tostring, clean
+import requests
+
 import yaml
 
-META_LUA_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-    'filters',
-    'meta.lua')
+META_LUA_PATH = Path(__file__).parent.parent / 'pandoc' / 'filters' / 'meta.lua'
 
-class Pandoc:
-    def __init__(self, *args, format='html'):
+class Document:
+    def __init__(self, *args):
         # There isn't a good way to specify yaml metadata for all writers
         # By using a filter we can manually specify a path to a yaml file
         # https://groups.google.com/d/msg/pandoc-discuss/6KLbZk7NVWk/0XMWewhLCQAJ
         # http://pandoc.org/lua-filters.html#default-metadata-file
 
-        self.metadata = {'title': 'foo'}
+        self.metadata = {}
         self._metadata_file = tempfile.NamedTemporaryFile('w', suffix='.markdown', delete=False)
         self._pandoc = subprocess.Popen(
             [
                 'pandoc',
                 *args,
-                '--from', format,
+                '--from', 'html',
                 '--lua-filter', META_LUA_PATH, '--metadata=metadata_file:'+self._metadata_file.name
             ],
             stdin=subprocess.PIPE)
-    
-    def write(self, *args, **kwargs):
+
+        self._session = requests.session()
+
+    def fetch_doc(self, url):
+        doc = document_fromstring(self._session.get(url).content)
+        doc.make_links_absolute(url)
+        return doc
+
+    def _write(self, *args, **kwargs):
         self._pandoc.stdin.write(*args, **kwargs)
-    
+
+    def write(self, *elements):
+        for e in elements:
+            self._write(tostring(e))
+
     def close(self):
         try:
             # Write metadata

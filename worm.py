@@ -1,29 +1,21 @@
 import logging
 import sys
 
-from lxml.html import document_fromstring, tostring, clean, builder as E
-import requests
+from lxml.html import builder as E
 
-from utils.pandoc import Pandoc
+import scraper
 
 logging.basicConfig()
 logger = logging.getLogger('worm')
 logger.setLevel(logging.INFO)
 
-pandoc = None
-
-def write(*elements):
-    for e in elements:
-        pandoc.write(tostring(e))
-
-def process_index(url):
+def process_index(document, url):
     logger.info('Processing story: %s', url)
-    doc = document_fromstring(requests.get(url).content)
+    doc = document.fetch_doc(url)
 
     title = str(doc.xpath('//meta[@property="og:title"]/@content')[0])
-    pandoc.metadata['title'] = title
-
-    pandoc.metadata['author'] = 'Wildbow'
+    document.metadata['title'] = title
+    document.metadata['author'] = 'Wildbow'
 
     categories = doc.get_element_by_id('categories-2')
 
@@ -39,17 +31,17 @@ def process_index(url):
         if arc_title == 'Stories (Pre-Worm 2)':
             continue
 
-        write(E.H1(arc_title))
+        document.write(E.H1(arc_title))
 
         for chapter in arc.iter('a'):
-            process_chapter(chapter.get('href'))
+            process_chapter(document, chapter.get('href'))
 
-def process_chapter(url):
+def process_chapter(document, url):
         logger.info('Processing chapter: %s', url)
-        doc = document_fromstring(requests.get(url).content)
+        doc = document.fetch_doc(url)
 
         title, = doc.find_class('entry-title')
-        write(E.H2(title.text_content))
+        document.write(E.H2(title.text_content))
 
         content, = doc.find_class('entry-content')
 
@@ -99,20 +91,17 @@ def process_chapter(url):
             
             del tag.attrib['style']
 
-        write(*content.getchildren())
+        document.write(*content.getchildren())
 
 def main():
-    global pandoc
-
     pandoc_args = sys.argv[1:]
     url = 'https://parahumans.wordpress.com/'
 
     logger.info('Starting Pandoc')
 
     # Set EPUB chapter level to 2 because the story is broken into sections
-    with Pandoc('--epub-chapter-level=2', *pandoc_args) as p:
-        pandoc = p
-        process_index(url)
+    with scraper.Document('--epub-chapter-level=2', *pandoc_args) as d:
+        process_index(d, url)
 
 if __name__ == '__main__':
     main()
