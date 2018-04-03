@@ -1,13 +1,6 @@
-import logging
 import sys
-
 from lxml.html import clean, builder as E
-
 import scraper
-
-logging.basicConfig()
-logger = logging.getLogger('keiramarkos')
-logger.setLevel(logging.INFO)
 
 clean = clean.Cleaner(
     remove_tags=('div', 'span', 'a'),
@@ -17,9 +10,7 @@ clean = clean.Cleaner(
 # TODO: write generic filter to convert dashes to <hr>
 
 def process_index(document, url):
-    logger.info('Processing story: %s', url)
     doc = document.fetch_doc(url)
-
     title = str(doc.xpath('//meta[@property="og:title"]/@content')[0])
     document.metadata['title'] = title
     document.metadata['author'] = 'Keira Markos'
@@ -34,7 +25,6 @@ def process_index(document, url):
         chapter_links = index_div[0].xpath('.//div[starts-with(@id, "tabs-")][1]//a')
         content.remove(index_div[0])
     elif chapter_links:
-        logger.warning('Using terrible heuristics to find chapter links')
         for link in chapter_links:
             # This also kills the tail text, but that is actually desirable
             link.getparent().remove(link)
@@ -51,7 +41,6 @@ def process_index(document, url):
         process_chapter(document, link.get('href'))
 
 def process_chapter(document, url, strip_authors_note=True):
-    logger.info('Processing chapter: %s', url)
     doc = document.fetch_doc(url)
 
     content, = doc.find_class('entry-content')
@@ -89,7 +78,6 @@ def main():
     pandoc_args = sys.argv[1:-1]
     url = sys.argv[-1]
 
-    logger.info('Starting Pandoc')
     with scraper.Document(*pandoc_args) as d:
         process_index(d, url)
 

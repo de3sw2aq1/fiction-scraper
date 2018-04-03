@@ -3,6 +3,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+import logging
 
 from lxml.html import document_fromstring, tostring, clean
 import requests
@@ -13,13 +14,18 @@ META_LUA_PATH = Path(__file__).parent.parent / 'pandoc' / 'filters' / 'meta.lua'
 
 class Document:
     def __init__(self, *args):
+        self._session = requests.session()
+
+        self._logger = logging.getLogger(__name__)
+
         # There isn't a good way to specify yaml metadata for all writers
         # By using a filter we can manually specify a path to a yaml file
         # https://groups.google.com/d/msg/pandoc-discuss/6KLbZk7NVWk/0XMWewhLCQAJ
         # http://pandoc.org/lua-filters.html#default-metadata-file
-
         self.metadata = {}
         self._metadata_file = tempfile.NamedTemporaryFile('w', suffix='.markdown', delete=False)
+
+        self._logger.debug('Starting Pandoc')
         self._pandoc = subprocess.Popen(
             [
                 'pandoc',
@@ -28,8 +34,6 @@ class Document:
                 '--lua-filter', META_LUA_PATH, '--metadata=metadata_file:'+self._metadata_file.name
             ],
             stdin=subprocess.PIPE)
-
-        self._session = requests.session()
 
     def fetch_doc(self, url):
         doc = document_fromstring(self._session.get(url).content)

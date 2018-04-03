@@ -1,16 +1,8 @@
-import logging
 import sys
-
 from lxml.html import builder as E
-
 import scraper
 
-logging.basicConfig()
-logger = logging.getLogger('cityofroses')
-logger.setLevel(logging.INFO)
-
 def process_index(document, url):
-    logger.info('Processing story: %s', url)
     doc = document.fetch_doc(url)
 
     document.metadata['title'] = str(doc.xpath('//meta[@property="og:site_name"]/@content')[0])
@@ -22,7 +14,6 @@ def process_index(document, url):
         process_chapter(document, link)
 
 def process_chapter(document, url):
-        logger.info('Processing chapter: %s', url)
         doc = document.fetch_doc(url)
 
         title, = doc.xpath('//title/text()')
@@ -56,8 +47,6 @@ def process_chapter(document, url):
 def main():
     pandoc_args = sys.argv[1:]
     url = 'http://thecityofroses.com/contents'
-
-    logger.info('Starting Pandoc')
 
     # Set EPUB chapter level to 2 because the story is broken into sections
     with scraper.Document('--epub-chapter-level=2', *pandoc_args) as d:
