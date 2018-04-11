@@ -15,12 +15,13 @@ EXTRA_PAGES = [
     'http://www.starwalkerblog.com/about/about-the-author/'
 ]
 
+CHAPTER_LEVEL = 3
 
 def heading(level, text, **kwargs):
     return E.E('h'+str(level), text, **kwargs)
 
 
-def process_subcategories(document, url, level=1):
+def process_subcategories(document, url, level=0):
     doc = document.fetch_doc(url)
     categories = doc.get_element_by_id('categories')
 
@@ -35,7 +36,7 @@ def process_subcategories(document, url, level=1):
         category = category[0]
         title, = category.xpath('a/text()')
 
-        if level == 1:
+        if level == 0:
             document.metadata['title'] = 'Starwalker ' + str(title)
         else:
             document.write(heading(level, title))
@@ -61,7 +62,7 @@ def process_subcategories(document, url, level=1):
     # Extra pages if all sections are included
     if url == URL_ALL:
         for url in EXTRA_PAGES:
-            process_page(document, url, level=level)
+            process_page(document, url, level=1)
 
 
 def process_category(document, url):
@@ -75,7 +76,7 @@ def process_category(document, url):
         process_category(document, prev_page[0].get('href'))
 
 
-def process_page(document, url, category_url=None, level=3):
+def process_page(document, url, category_url=None, level=CHAPTER_LEVEL):
     doc = document.fetch_doc(url)
 
     # If we are processing Alt timeline pages when we only want Rosetta pages, skip them
@@ -97,7 +98,7 @@ def process_page(document, url, category_url=None, level=3):
     # Convert headings (only from EXTRA_PAGES) to <h4>
     for tag in content.iter():
         if tag.tag[0] == 'h':
-            tag.tag = 'h4'
+            tag.tag = 'h'+str(CHAPTER_LEVEL+1)
 
     document.write(*content)
 
@@ -132,15 +133,14 @@ def main():
     try:
         cover = process_cover_image()
 
-        # Set EPUB chapter level to 2 because there are categories
-        with scraper.Document('--epub-chapter-level=2', *pandoc_args) as d:
+        # Set EPUB chapter level to 3 (CHAPTER_LEVEL) because there are categories
+        with scraper.Document('--epub-chapter-level', str(CHAPTER_LEVEL), *pandoc_args) as d:
             process_summary(d)
             process_subcategories(d, url)
 
             d.metadata['author'] = 'Melanie Edmonds'
             d.metadata['cover-image'] = cover
             # TODO: add stylesheets (for <pre> tags, etc)
-
     finally:
         os.unlink(cover)
 
