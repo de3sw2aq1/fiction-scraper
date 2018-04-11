@@ -1,9 +1,13 @@
+import os
 import sys
+from tempfile import NamedTemporaryFile
 from lxml.html import builder as E
+import requests
 import scraper
 
 URL_ALL = 'http://www.starwalkerblog.com/'
 URL_SUMMARY = 'http://www.starwalkerblog.com/about/about-starwalker/'
+URL_COVER = 'http://www.starwalkerblog.com/wp-content/uploads/2012/07/Spiral2_sm.jpg'
 EXTRA_PAGES = [
     'http://www.starwalkerblog.com/cast/',
     'http://www.starwalkerblog.com/colonies/',
@@ -105,6 +109,15 @@ def process_summary(document):
     document.metadata['description'] = summary
 
 
+def process_cover_image():
+    cover = NamedTemporaryFile(suffix='.jpg', delete=False)
+    cover.write(
+        requests.get(URL_COVER).content
+    )
+    cover.close()
+    return cover.name
+
+
 def main():
     if len(sys.argv) < 2 or not sys.argv[-1].startswith('http://www.starwalkerblog.com/'):
         print('Usage:', sys.argv[0], '[PANDOC_ARGS, ...]', 'URL', file=sys.stderr)
@@ -116,14 +129,20 @@ def main():
     pandoc_args = sys.argv[1:-1]
     url = sys.argv[-1]
 
-    # Set EPUB chapter level to 2 because there are categories
-    with scraper.Document('--epub-chapter-level=2', *pandoc_args) as d:
-        d.metadata['author'] = 'Melanie Edmonds'
+    try:
+        cover = process_cover_image()
 
-        # TODO: add stylesheets (for <pre> tags, etc)
+        # Set EPUB chapter level to 2 because there are categories
+        with scraper.Document('--epub-chapter-level=2', *pandoc_args) as d:
+            process_summary(d)
+            process_subcategories(d, url)
 
-        process_summary(d)
-        process_subcategories(d, url)
+            d.metadata['author'] = 'Melanie Edmonds'
+            d.metadata['cover-image'] = cover
+            # TODO: add stylesheets (for <pre> tags, etc)
+
+    finally:
+        os.unlink(cover)
 
 
 if __name__ == '__main__':
