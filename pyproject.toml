@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "fiction-scrapers"
+version = "0.1.0"
+description = ""
+authors = ["de3sw2aq1 <de3sw2aq1@ymail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+lxml = "^4.2"
+PyYAML = "^3.13"
+requests = "^2.19"
+cssselect = "^1.0"
+
+[tool.poetry.dev-dependencies]
