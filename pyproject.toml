@@ -13,3 +13,4 @@ requests = "^2.19"
 cssselect = "^1.0"
 
 [tool.poetry.dev-dependencies]
+pylint = "^2.0"

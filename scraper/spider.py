@@ -1,71 +1,72 @@
+from abc import ABC, abstractmethod
 import os
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
 import logging
 
-from lxml.html import document_fromstring, tostring, clean
+from lxml.html import document_fromstring, tostring, builder as E
 import requests
 
-import yaml
 
-META_LUA_PATH = Path(__file__).parent.parent / 'pandoc' / 'filters' / 'meta.lua'
-
-class Document:
-    def __init__(self, *args):
+class Spider(ABC):
+    def __init__(self, url, *args):
+        super().__init__()
         self._session = requests.session()
-
-        self._logger = logging.getLogger(__name__)
-
-        # There isn't a good way to specify yaml metadata for all writers
-        # By using a filter we can manually specify a path to a yaml file
-        # https://groups.google.com/d/msg/pandoc-discuss/6KLbZk7NVWk/0XMWewhLCQAJ
-        # http://pandoc.org/lua-filters.html#default-metadata-file
+        self._logger = logging.getLogger(self.__class__.__name__)
         self.metadata = {}
-        self._metadata_file = tempfile.NamedTemporaryFile('w', suffix='.markdown', delete=False)
+        self.url = url
 
-        self._logger.debug('Starting Pandoc')
-        self._pandoc = subprocess.Popen(
-            [
-                'pandoc',
-                *args,
-                '--from', 'html',
-                '--lua-filter', META_LUA_PATH, '--metadata=metadata_file:'+self._metadata_file.name
-            ],
-            stdin=subprocess.PIPE)
+    @property
+    @abstractmethod
+    def domain(self):
+        pass
 
-    def fetch_doc(self, url):
-        doc = document_fromstring(self._session.get(url).content)
-        doc.make_links_absolute(url)
+    @abstractmethod
+    def parse(self):
+        pass
+
+    def fetch(self, url):
+        r = self._session.get(url)
+        doc = document_fromstring(r.content)
+        doc.make_links_absolute(r.url)
         return doc
 
-    def _write(self, *args, **kwargs):
-        self._pandoc.stdin.write(*args, **kwargs)
+    def crawl(self):
+        # Clear metadata in case story is being re-crawled
+        self.metadata = {}
 
-    def write(self, *elements):
-        for e in elements:
-            self._write(tostring(e))
+        self.info('beginning parse')
+        body = E.BODY(*self.parse())
 
-    def close(self):
-        try:
-            # Write metadata
-            yaml.safe_dump(
-                self.metadata,
-                self._metadata_file,
-                explicit_start=True,
-                explicit_end=True,
-                default_flow_style=False)
-        finally:
-            # Close stdin to pandoc
-            self._pandoc.stdin.close()
+        # parse() must be called before metadata is accessed, or it may not be
+        # populated yet. 
+        head = E.HEAD(*self._generate_meadata_elements())
 
-            # Wait for pandoc and clean up
-            self._pandoc.wait()
-            os.unlink(self._metadata_file.name)
+        doc = E.HTML(head, body)
+        
+        return tostring(doc, encoding='unicode', pretty_print=True, doctype='<!doctype html>')
     
-    def __enter__(self):
-        return self
+    def debug(self, *args, **kwargs):
+        self._logger.debug(*args, **kwargs)
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
+    def info(self, *args, **kwargs):
+        self._logger.info(*args, **kwargs)
+    
+    def warning(self, *args, **kwargs):
+        self._logger.warning(*args, **kwargs)
+    
+    def critical(self, *args, **kwargs):
+        self._logger.critical(*args, **kwargs)
+
+    def log(self, *args, **kwargs):
+        self._logger.log(*args, **kwargs)
+
+    def _generate_meadata_elements(self):
+        yield E.META(charset="UTF-8")
+
+        for name, content in self.metadata.items():
+            if name == 'title':
+                yield E.TITLE(content)
+            else:
+                yield E.META(name=name, content=content)

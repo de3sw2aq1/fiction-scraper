@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+
+import scraper
+import argparse
+import os
+import logging
+import re
+from urllib.parse import urlparse
+
+LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
+logging.basicConfig(level=LOGLEVEL)
+
+parser = argparse.ArgumentParser()
+parser.add_argument("url")
+args = parser.parse_args()
+
+url = args.url
+domain = urlparse(url).netloc
+domain = re.sub(r'^www\.', '', domain)
+spider = scraper.spiders[domain](url=url)
+print(spider.crawl())
