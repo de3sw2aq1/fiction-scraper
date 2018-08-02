@@ -8,6 +8,8 @@ import logging
 from lxml.html import document_fromstring, tostring, builder as E
 import requests
 
+from . import filters
+
 
 class Spider(ABC):
     def __init__(self, *args):
@@ -15,6 +17,7 @@ class Spider(ABC):
         self._session = requests.session()
         self._logger = logging.getLogger(self.__class__.__name__)
         self.metadata = {}
+        self.filters = filters.DEFAULT_FILTERS[:]
 
     @property
     @abstractmethod
@@ -37,6 +40,10 @@ class Spider(ABC):
 
         self.info('beginning parse')
         body = E.BODY(*self.parse(url))
+
+        # Apply all filter functions in order
+        for f in self.filters:
+            f(body)
 
         # parse() must be called before metadata is accessed, or it may not be
         # populated yet. 
