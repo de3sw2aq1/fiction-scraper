@@ -17,5 +17,5 @@ args = parser.parse_args()
 url = args.url
 domain = urlparse(url).netloc
 domain = re.sub(r'^www\.', '', domain)
-spider = scraper.spiders[domain](url=url)
-print(spider.crawl())
+spider = scraper.spiders[domain]()
+print(spider.crawl(url))

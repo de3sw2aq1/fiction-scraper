@@ -7,7 +7,7 @@ START_URL = 'https://parahumans.wordpress.com/'
 class Worm(Spider):
     domain = 'parahumans.wordpress.com'
 
-    def parse(self):
+    def parse(self, url):
         doc = self.fetch(START_URL)
 
         title = str(doc.xpath('//meta[@property="og:title"]/@content')[0])

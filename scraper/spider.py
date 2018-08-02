@@ -10,12 +10,11 @@ import requests
 
 
 class Spider(ABC):
-    def __init__(self, url, *args):
+    def __init__(self, *args):
         super().__init__()
         self._session = requests.session()
         self._logger = logging.getLogger(self.__class__.__name__)
         self.metadata = {}
-        self.url = url
 
     @property
     @abstractmethod
@@ -23,7 +22,7 @@ class Spider(ABC):
         pass
 
     @abstractmethod
-    def parse(self):
+    def parse(self, url):
         pass
 
     def fetch(self, url):
@@ -32,12 +31,12 @@ class Spider(ABC):
         doc.make_links_absolute(r.url)
         return doc
 
-    def crawl(self):
+    def crawl(self, url):
         # Clear metadata in case story is being re-crawled
         self.metadata = {}
 
         self.info('beginning parse')
-        body = E.BODY(*self.parse())
+        body = E.BODY(*self.parse(url))
 
         # parse() must be called before metadata is accessed, or it may not be
         # populated yet. 

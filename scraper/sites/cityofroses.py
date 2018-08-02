@@ -8,7 +8,7 @@ START_URL = 'http://thecityofroses.com/contents'
 class Cityofroses(Spider):
     domain = 'thecityofroses.com'
 
-    def parse(self):
+    def parse(self, url):
         doc = self.fetch(START_URL)
 
         title, = doc.xpath('//meta[@property="og:site_name"]/@content')

@@ -13,8 +13,8 @@ clean = clean.Cleaner(
 class Keiramarcos(Spider):
     domain = 'keiramarcos.com'
 
-    def parse(self):
-        doc = self.fetch(self.url)
+    def parse(self, url):
+        doc = self.fetch(url)
         title, = doc.xpath('//meta[@property="og:title"]/@content')
         self.metadata['title'] = title.strip()
         self.metadata['author'] = 'Keira Markos'
@@ -34,7 +34,7 @@ class Keiramarcos(Spider):
                 link.getparent().remove(link)
         else:
             # This is a single chapter story
-            yield from self._parse_chapter(self.url, strip_authors_note=False)
+            yield from self._parse_chapter(url, strip_authors_note=False)
             return
 
         clean(content)

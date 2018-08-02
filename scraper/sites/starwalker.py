@@ -23,9 +23,7 @@ def heading(level, text, **kwargs):
 class Starwalker(Spider):
     domain = 'starwalkerblog.com'
 
-    def parse(self, url=None, level=0):
-        if not url:
-            url = self.url
+    def parse(self, url, level=0):
         self.info(f'Parsing page: {url}')
 
         doc = self.fetch(url)

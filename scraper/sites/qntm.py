@@ -14,9 +14,7 @@ class qntm(Spider):
         super().__init__(*args, **kwargs)
         self._heading_ids = set()
 
-    def parse(self, url=None, level=1):
-        if not url:
-            url = self.url
+    def parse(self, url, level=1):
         self.info(f'Parsing page: {url}' )
 
         doc = self.fetch(url)
