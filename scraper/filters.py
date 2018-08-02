@@ -13,4 +13,4 @@ clean = clean.Cleaner(
 
 # TODO: add filter to ensure ids are unique throughout the document
 
-DEFAULT_FILTERS = [clean]
+DEFAULT_FILTERS = (clean,)

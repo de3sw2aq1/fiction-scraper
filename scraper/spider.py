@@ -17,7 +17,8 @@ class Spider(ABC):
         self._session = requests.session()
         self._logger = logging.getLogger(self.__class__.__name__)
         self.metadata = {}
-        self.filters = filters.DEFAULT_FILTERS[:]
+
+    filters = filters.DEFAULT_FILTERS
 
     @property
     @abstractmethod
