@@ -1,8 +1,8 @@
-import sys
 from lxml.html import builder as E
 from . import Spider
 
 START_URL = 'https://parahumans.wordpress.com/'
+
 
 class Worm(Spider):
     domain = 'parahumans.wordpress.com'
@@ -20,7 +20,7 @@ class Worm(Spider):
         for arc in categories.xpath('.//ul[not(li/ul)]'):
             # Title is in previous <a>
             arc_title = arc.getprevious().text
-            
+
             # Arc 10 has a leading soft hyphen, do some cleanup
             arc_title = arc_title.replace('\u00ad', '').strip()
 
@@ -43,7 +43,7 @@ class Worm(Spider):
 
             # Remove social media links
             for tag in content.find_class('sharedaddy'):
-                tag.getparent().remove(tag)
+                tag.drop_tree()
 
             # Remove next/previous chapter links
             # The only other link is an Urban Dictionary definition of "trigger warnings"
@@ -52,8 +52,8 @@ class Worm(Spider):
                     # Remove parent <p> tag completely
                     parent = link.getparent()
                     if parent.getparent() is not None:
-                        parent.getparent().remove(parent)
-            
+                        parent.drop_tree()
+
             # parse inline styles
             for tag in content.xpath('.//*[@style]'):
                 style = tag.get('style')
@@ -73,7 +73,7 @@ class Worm(Spider):
                     tag.addprevious(blockquote)
                     nested_blockquote.insert(0, tag)
 
-                # Pandoc doesn't support styles on <p> so the tag has to be wrapped     
+                # Pandoc doesn't support styles on <p> so the tag has to be wrapped
                 # In a <div> with the style
                 elif 'text-align:center;' in style:
                     div = E.DIV(style='text-align:center')
@@ -84,7 +84,7 @@ class Worm(Spider):
                 # Thankfully these are on <span> tags, not <p> tags
                 elif 'text-decoration:underline' in style:
                     continue
-                
+
                 del tag.attrib['style']
 
             yield from content
