@@ -1,8 +1,4 @@
-import os
-import sys
-from tempfile import NamedTemporaryFile
 from lxml.html import builder as E
-import requests
 from . import Spider
 
 URL_ALL = 'http://www.starwalkerblog.com/'
@@ -17,19 +13,22 @@ EXTRA_PAGES = [
 
 CHAPTER_LEVEL = 3
 
+
 def heading(level, text, **kwargs):
     return E.E('h'+str(level), text, **kwargs)
+
 
 class Starwalker(Spider):
     domain = 'starwalkerblog.com'
 
     def parse(self, url, level=0):
-        self.info(f'Parsing page: {url}')
-
         doc = self.fetch(url)
+
         categories = doc.get_element_by_id('categories')
 
         if url == URL_ALL:
+            # If crawling the entire story
+
             category = categories
             self.metadata['title'] = 'Starwalker'
             self.metadata['author'] = 'Melanie Edmonds'
@@ -43,6 +42,8 @@ class Starwalker(Spider):
             title, = category.xpath('a/text()')
 
             if level == 0:
+                # If crawling a single category
+
                 self.metadata['title'] = 'Starwalker ' + str(title)
                 self.metadata['author'] = 'Melanie Edmonds'
                 self._parse_summary()
@@ -51,7 +52,7 @@ class Starwalker(Spider):
 
         subcategory_urls = category.xpath('ul/li/a/@href')
 
-        # "4.4: Rosetta" contains both chapters and the 
+        # "4.4: Rosetta" contains both chapters and the
         # subcategory "Book 4 Alt Timeline"
         if not subcategory_urls or url == 'http://www.starwalkerblog.com/category/4-black-star/rosetta/':
             # Add ?order=asc because some categories are in reverse order
@@ -67,7 +68,7 @@ class Starwalker(Spider):
             else:
                 yield from self.parse(subcategory_url, level+1)
 
-        # Extra pages if all sections are included
+        # Extra pages if crawling whole story
         if url == URL_ALL:
             for url in EXTRA_PAGES:
                 yield from self._parse_page(url, level=1)
@@ -85,8 +86,8 @@ class Starwalker(Spider):
     def _parse_page(self, url, category_url=None, level=CHAPTER_LEVEL):
         doc = self.fetch(url)
 
-        # If we are parsing Alt timeline pages when we only want Rosetta pages, skip them
-        # The page's category will be more specific than the desired category_url
+        # If we are parsing Alt timeline pages when we only want Rosetta pages, skip them.
+        # The page's category will be more specific than the desired category_url.
         for c in doc.xpath('//a[@rel="category tag"]'):
             if category_url and not category_url.startswith(c.get('href')):
                 return
@@ -99,7 +100,7 @@ class Starwalker(Spider):
 
         # Remove share links
         for tag in content.cssselect('.reaction_buttons, .sharedaddy'):
-            tag.getparent().remove(tag)
+            tag.drop_tree()
 
         # Convert headings (only from EXTRA_PAGES) to <h4>
         for tag in content.iter():
