@@ -40,14 +40,15 @@ from lxml.html import clean, builder as E
 class Cleaner(clean.Cleaner):
     """Cleaner to remove unnecessary tags and attributes.
 
-    Currently removes <div> and <span> tags preserving their children.
+    Currently removes <div> tags preserving their children.
     All attributes except what lxml considers to be "safe" are removed.
     Additionally the attributes `width`, `height`, `dir` and `align` are
     removed.
 
     Instances of this class are usable as a filter.
     """
-    remove_tags = ('div', 'span')
+
+    remove_tags = ('div')
     safe_attrs = clean.Cleaner.safe_attrs - {'width', 'height', 'align', 'dir'}
 
 
