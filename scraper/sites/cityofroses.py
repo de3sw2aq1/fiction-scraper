@@ -1,11 +1,19 @@
 from lxml.html import builder as E
-from . import Spider
+from . import Spider, filters
 
 START_URL = 'http://thecityofroses.com/contents'
 
 
+def scene_breaks(root):
+    # Replace empty <h6> tags with <br>
+    for h6 in root.xpath('.//h6'):
+        h6.addprevious(E.HR(E.CLASS('scene-break')))
+        h6.drop_tree()
+
+
 class Cityofroses(Spider):
     domain = 'thecityofroses.com'
+    filters = (scene_breaks, *filters.DEFAULT_FILTERS)
 
     def parse(self, url):
         doc = self.fetch(START_URL)
@@ -26,11 +34,6 @@ class Cityofroses(Spider):
         yield E.H1(title)
 
         content = doc.get_element_by_id('content')
-
-        # Replace empty <h6> tags with <br>
-        for h6 in content.iter('h6'):
-            h6.addprevious(E.HR())
-            h6.drop_tree()
 
         for tag in content:
             # Start of section

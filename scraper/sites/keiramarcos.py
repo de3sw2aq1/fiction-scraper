@@ -1,13 +1,14 @@
+import re
+
 from lxml.html import clean, builder as E
-from . import Spider
-from . import filters
+from . import Spider, filters
 
 # Remove some wordpress tags and attributes
 # TODO: is removing <a> needed?
-clean = clean.Cleaner(
-    remove_tags=('div', 'span', 'a', 'table', 'tbody', 'tr', 'td'),
-    safe_attrs=clean.Cleaner.safe_attrs - {'class', 'width', 'height'}
-)
+class Cleaner(clean.Cleaner):
+    remove_tags = ('a', 'table', 'tbody', 'tr', 'td')
+    safe_attrs = clean.Cleaner.safe_attrs - {'class'}
+
 
 # TODO: write generic filter to convert dashes to <hr> tags
 # TODO: set story summary
@@ -16,9 +17,16 @@ clean = clean.Cleaner(
 # TODO: Some stories put the chapter links in a table that goes down (not across) and the chapters are out of order
 
 
+def scene_breaks(root):
+    for e in root:
+        if re.match(r'(\s*[—–-]+\s*)+', e.text_content()):
+            e.addprevious(E.HR(E.CLASS('scene-break')))
+            e.drop_tree()
+
+
 class Keiramarcos(Spider):
     domain = 'keiramarcos.com'
-    filters = (clean, *filters.DEFAULT_FILTERS)
+    filters = (filters.kill_classes, Cleaner(), scene_breaks, *filters.DEFAULT_FILTERS)
 
     def parse(self, url):
         doc = self.fetch(url)
@@ -68,10 +76,6 @@ class Keiramarcos(Spider):
             first_tag = content[0]
             if 'Title:' in first_tag.text_content():
                 content[0].drop_tree()
-
-        # Remove blog share links
-        for div in content.find_class('sharedaddy'):
-            div.drop_tree()
 
         # Remove link to next chapter (any link in last paragraph)
         last_link = content.xpath('*[last()]/a')

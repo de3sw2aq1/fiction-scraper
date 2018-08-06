@@ -1,5 +1,5 @@
 from lxml.html import builder as E
-from . import Spider
+from . import Spider, filters
 
 URL_ALL = 'http://www.starwalkerblog.com/'
 URL_SUMMARY = 'http://www.starwalkerblog.com/about/about-starwalker/'
@@ -20,6 +20,7 @@ def heading(level, text, **kwargs):
 
 class Starwalker(Spider):
     domain = 'starwalkerblog.com'
+    filters = [filters.kill_classes, *filters.DEFAULT_FILTERS]
 
     def parse(self, url, level=0):
         doc = self.fetch(url)
@@ -70,8 +71,8 @@ class Starwalker(Spider):
 
         # Extra pages if crawling whole story
         if url == URL_ALL:
-            for url in EXTRA_PAGES:
-                yield from self._parse_page(url, level=1)
+            for page_url in EXTRA_PAGES:
+                yield from self._parse_page(page_url, level=1)
 
     def _parse_category(self, url):
         doc = self.fetch(url)
@@ -98,10 +99,6 @@ class Starwalker(Spider):
         # Blog posts use .entry and pages use .entrytext
         content, = doc.cssselect('.entrytext, .entry')
 
-        # Remove share links
-        for tag in content.cssselect('.reaction_buttons, .sharedaddy'):
-            tag.drop_tree()
-
         # Convert headings (only from EXTRA_PAGES) to <h4>
         for tag in content.iter():
             if tag.tag[0] == 'h':
@@ -114,11 +111,3 @@ class Starwalker(Spider):
         summary_paragraphs = doc.xpath('//div[@class="entrytext"]/p')
         summary = '\n\n'.join(p.text_content().strip() for p in summary_paragraphs)
         self.metadata['description'] = summary
-
-    # TODO: make cover images work in Spider class
-    # def parse_cover_image():
-    #     cover = NamedTemporaryFile(suffix='.jpg', delete=False)
-    #     cover.write(
-    #         requests.get(URL_COVER).content
-    #     )
-    #     cover.close()

@@ -1,35 +1,75 @@
-import sys
-from lxml.html import clean, builder as E
-from . import Spider
+from lxml.html import builder as E
+from . import Spider, filters
 
-# Cleaner to remove id attribute
-clean = clean.Cleaner(
-    safe_attrs=clean.Cleaner.safe_attrs - {'id'}
-)
-    
-class qntm(Spider):
+
+# TODO: conditionally output comments?
+# Ra has lots of HTML comments with fun details
+# Transform them into real tags maybe?
+
+# TODO: add stylesheet with default left alignment for Ra
+
+# TODO: add .scene-break css class to draw * symbol
+
+
+def scene_breaks(root):
+    # Empty <h3> tags appear as a rule on qntm.org
+    for e in root.xpath('.//h3'):
+        if len(e) == 0 and e.text_content().strip() == "":
+            e.addprevious(E.HR())
+            e.drop_tree()
+
+    # Other stories use a centered orange * as a scene break
+    for e in root.xpath('.//h4'):
+        if e.text_content().strip() == "*":
+            e.addprevious(E.HR(E.CLASS('scene-break')))
+            e.drop_tree()
+
+
+def rewrite_links(root):
+    """Make links internal to the document.
+
+    During parsing ids are added to headings.
+    """
+
+    heading_ids = root.xpath('*//@id')
+
+    def rewrite(link):
+        if link.startswith('https://qntm.org/'):
+            id_ = link.split('/')[-1]
+            if id_ in heading_ids:
+                return '#' + id_
+        return link
+
+    root.rewrite_links(rewrite)
+
+
+def heading(level, text, **kwargs):
+    return E.E('h'+str(level), text, **kwargs)
+
+
+class Qntm(Spider):
     domain = 'qntm.org'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._heading_ids = set()
+    filters = (
+        scene_breaks,
+        filters.text_alignment,
+        rewrite_links,
+        *filters.DEFAULT_FILTERS)
 
     def parse(self, url, level=1):
-        self.info(f'Parsing page: {url}' )
-
         doc = self.fetch(url)
-        doc.rewrite_links(self._rewrite_links)
 
         if level == 1:
             title = doc.xpath('//h2')[0].text_content().strip()
             self.metadata['title'] = title
             self.metadata['author'] = 'Sam Hughes'
-        
-        content = doc.get_element_by_id('content')
 
-        today_in = content.xpath('h3[starts-with(text(), "Today in ") or text() = "Contents" or text() = "Or just read it here for free!"]')
+        content = doc.get_element_by_id('content')
+        today_in = content.xpath(
+            """h3[starts-with(text(), "Today in ") or
+            text() = "Contents" or
+            text() = "Or just read it here for free!"]""")
         if today_in:
-            # This is a "subdirecory" listing
+            # This is a "subdirectory" listing
 
             # Output any summary/into if present
             for tag in content:
@@ -44,10 +84,9 @@ class qntm(Spider):
                     continue
 
                 yield tag
-            
+
             chapter_level = level
-                        
-            # import ipdb; ipdb.set_trace()
+
             # Parse each linked page in the "subdirectory"
             for tag in today_in[0].itersiblings():
                 # Skip tag if it says "Read from top to bottom"
@@ -64,9 +103,8 @@ class qntm(Spider):
 
                         # Add id attributes to headings to allow internal links
                         heading_id = link.get('href').split('/')[-1]
-                        self._heading_ids.add(heading_id)
 
-                        yield self._heading(chapter_level, link.text, id=heading_id)
+                        yield heading(chapter_level, link.text, id=heading_id)
                         yield from self.parse(link.get('href'), chapter_level+1)
                         # This loses any text outside the <a> in the <li>, but
                         # unless we add a table of contents for appendices, there's
@@ -75,7 +113,7 @@ class qntm(Spider):
                 elif tag.tag == 'h4':
                     # Found a subheading like "Appendices"
                     # Output it and change chapter_level
-                    yield self._heading(level, tag.text_content().strip())
+                    yield heading(level, tag.text_content().strip())
                     chapter_level = level + 1
 
                 else:
@@ -90,46 +128,10 @@ class qntm(Spider):
             # the <h3> and <h4> tags inside chapters is okay. And thankfully
             # there don't seem to be any <h1> or <h2> tags within the content.
 
-            # Remove prevously/next links
+            # Remove previously/next links
             remove = content.xpath('h4[a/text()="Previously"]')
             remove.extend(content.xpath('h4[starts-with(text(), "Next:")]'))
             for tag in remove:
                 tag.getparent().remove(tag)
 
-            for tag in content.iter():
-                # Ra has meaningul text alignment, convert text-align styles to classes
-                style = tag.get('style')
-                if style and 'text-align: center' in style:
-                    div = E.DIV(E.CLASS('center-aligned'))
-                    tag.addprevious(div)
-                    div.insert(0, tag)
-                elif style and 'text-align: right' in tag.get('style'):
-                    div = E.DIV(E.CLASS('right-aligned'))
-                    tag.addprevious(div)
-                    div.insert(0, tag)
-
-                # Empty <h3> tags render as a rule on qntm.org, convert them to <hr> tags
-                if tag.tag == 'h3' and len(tag) == 0 and tag.text_content().strip() == "":
-                    tag.tag = 'hr'
-                
-                # TODO: conditionally output comments?
-                # Ra has lots of HTML comments with fun details
-                # Transform them into real tags maybe?
-
-            # TODO: add stylesheet that includes alignment classes
-            # TODO: add stylesheet with default left alignment for Ra
-    
-            clean(content)
             yield from content
-    
-    # Convert internal links into a fragment linking to the anchor
-    def _rewrite_links(self, link):
-        if link.startswith('https://qntm.org/'):
-            id_ = link.split('/')[-1]
-            if id_ in self._heading_ids:
-                return '#' + id_
-
-        return link
-
-    def _heading(self, level, text, **kwargs):
-        return E.E('h'+str(level), text, **kwargs)
