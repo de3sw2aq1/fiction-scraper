@@ -30,9 +30,14 @@ class Spider(ABC):
         pass
 
     def fetch(self, url):
+        """Fetch a URL and return it as an lxml document.
+
+        Follows HTTP redirects. The `base_url` is set on the returned
+        document. All links in the document are converted to absolute links.
+        """
         r = self._session.get(url)
-        doc = document_fromstring(r.content)
-        doc.make_links_absolute(r.url)
+        doc = document_fromstring(r.content, base_url=r.url)
+        doc.make_links_absolute()
         return doc
 
     def crawl(self, url):
@@ -42,7 +47,7 @@ class Spider(ABC):
         self.info('beginning parse')
         body = E.BODY(*self.parse(url))
 
-        # Apply all filter functions in order
+        self.info('applying filters')
         for f in self.filters:
             f(body)
 
@@ -51,7 +56,8 @@ class Spider(ABC):
         head = E.HEAD(*self._generate_meadata_elements())
 
         doc = E.HTML(head, body)
-        
+
+        self.info('tostring on document')
         return tostring(doc, encoding='unicode', pretty_print=True, doctype='<!doctype html>')
     
     def debug(self, *args, **kwargs):
