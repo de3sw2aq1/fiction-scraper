@@ -97,7 +97,7 @@ def text_alignment(root, directions=None):
                 del e.attrib['align']
 
 
-# TODO: add stylesheet that includes alignment classes
+# TODO: add stylesheet that includes decoration classes
 def text_decoration(root, decorations=None):
     """Convert `text-decoration: underline` in style attributes to
     a class."""
@@ -131,10 +131,8 @@ def move_attrs_to_div(root, elements=('p',)):
             wrapper.insert(0, e)
 
             # The styles, etc shouldn't affect the tail text of the element
-            # FIXME: fix handling of tail
-            e.tail = e.tail.strip()
-            if e.tail:
-                raise Exception('FIXME: non-empty tail found')
+            wrapper.tail = e.tail
+            e.tail = None
 
 
 DEFAULT_FILTERS = (text_decoration, Cleaner(), move_attrs_to_div)
