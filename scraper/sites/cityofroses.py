@@ -3,6 +3,8 @@ from . import Spider, filters
 
 START_URL = 'http://thecityofroses.com/contents'
 
+# TODO: story uses <span class="caps"> for small caps
+# TODO: use picture icon for scene break
 
 def scene_breaks(root):
     # Replace empty <h6> tags with <br>
@@ -33,19 +35,17 @@ class Cityofroses(Spider):
         title = title.split(' | ')[-1].strip()
         yield E.H1(title)
 
-        content = doc.get_element_by_id('content')
-
-        for tag in content:
+        for tag in doc.get_element_by_id('content'):
             # Start of section
             if tag.tag == 'h3':
                 yield E.H2(tag.text_content().strip())
 
             # Section content
-            elif tag.get('class') == 'grafset':
+            elif 'grafset' in tag.classes:
                 yield from tag
 
             # End note
-            elif tag.get('class') == 'endnote':
-                # Change <p> into a <blockquote>
+            elif 'endnote' in tag.classes:
+                # Change tag into a <blockquote class="endnote">
                 tag.tag = 'blockquote'
                 yield tag
