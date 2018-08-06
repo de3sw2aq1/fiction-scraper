@@ -6,7 +6,7 @@ Crawl https://parahumans.wordpress.com/ to use this spider.
 import re
 
 from lxml.html import builder as E
-from . import Spider, filters
+from .. import Spider, filters
 
 START_URL = 'https://parahumans.wordpress.com/'
 

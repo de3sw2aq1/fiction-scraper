@@ -1,7 +1,7 @@
 import re
 
 from lxml.html import clean, builder as E
-from . import Spider, filters
+from .. import Spider, filters
 
 # Remove some wordpress tags and attributes
 # TODO: is removing <a> needed?

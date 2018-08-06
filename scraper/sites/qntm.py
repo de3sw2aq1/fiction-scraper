@@ -1,5 +1,5 @@
 from lxml.html import builder as E
-from . import Spider, filters
+from .. import Spider, filters
 
 
 # TODO: conditionally output comments?

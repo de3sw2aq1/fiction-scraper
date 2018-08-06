@@ -1,5 +1,5 @@
 from lxml.html import builder as E
-from . import Spider, filters
+from .. import Spider, filters
 
 URL_ALL = 'http://www.starwalkerblog.com/'
 URL_SUMMARY = 'http://www.starwalkerblog.com/about/about-starwalker/'
