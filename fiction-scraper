@@ -7,12 +7,17 @@ import subprocess
 import sys
 from urllib.parse import urlparse
 
-import scraper
+from fiction_scraper import spiders
 
+
+# TODO remove
+import requests
+import requests_cache
+requests_cache.install_cache('cache')
 
 DEFAULT_PANDOC_ARGS = (
     'pandoc',
-    '--from', 'html',
+    '--from', 'html+raw_html',
     '--standalone',
     '--epub-chapter-level', '3')
 
@@ -23,7 +28,7 @@ parser = argparse.ArgumentParser(
     epilog='\n'.join([
         'Suppported sites and sample URLs:',
         '',
-        *(f'  {s.name:21s} {s.url}' for s in scraper.spiders.values()),
+        *(f'  {s.name:21s} {s.url}' for s in spiders.values()),
         '',
         'Note, some sites may have multiple stories at additional URLs.'
     ]))
@@ -74,7 +79,7 @@ else:
 url = args.URL
 domain = urlparse(url).netloc
 domain = re.sub(r'^www\.', '', domain)
-spider = scraper.spiders[domain]()
+spider = spiders[domain]()
 spider.crawl(url, output)
 output.close()
 

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "fiction-scrapers"
+name = "fiction-scraper"
 version = "0.1.0"
 description = ""
 authors = ["de3sw2aq1 <de3sw2aq1@ymail.com>"]
@@ -12,3 +12,7 @@ requests = "^2.19"
 cssselect = "^1.0"
 
 [tool.poetry.dev-dependencies]
+
+# Pending https://github.com/sdispater/poetry/issues/241
+# [tool.poetry.scripts]
+# fiction-scraper = { path = "fiction-scraper" }
