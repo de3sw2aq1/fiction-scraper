@@ -1,36 +1,58 @@
 #!/usr/bin/env python3
 
-import scraper
 import argparse
-import os
 import logging
 import re
-from urllib.parse import urlparse
-import sys
 import subprocess
+import sys
+from urllib.parse import urlparse
+
+import scraper
+
 
 DEFAULT_PANDOC_ARGS = (
     'pandoc',
-    '-f', 'html',
+    '--from', 'html',
     '--standalone',
     '--epub-chapter-level', '3')
 
 
-loglevel = os.environ.get('LOGLEVEL', 'WARNING').upper()
-logging.basicConfig(level=loglevel)
-
-parser = argparse.ArgumentParser()
-parser.add_argument('url',
-    help='URL of story to download.')
+parser = argparse.ArgumentParser(
+    description='A variety of scrapers for online fiction and fanfiction',
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    epilog='\n'.join([
+        'Suppported sites and sample URLs:',
+        '',
+        *(f'  {s.name:21s} {s.url}' for s in scraper.spiders.values()),
+        '',
+        'Note, some sites may have multiple stories at additional URLs.'
+    ]))
+parser.add_argument('URL',
+    help='URL of story to download')
 parser.add_argument('-o', '--output',
     default=None,
-    help="""Output file to write story to. If using Pandoc, the specified
+    help="""Output file for the story. If using Pandoc, the specified
         extension will be used to select the output format. Otherwise
-        include the .html extension.""")
+        include the .html extension. If omitted the HTML will be written to
+        standard output.""")
 parser.add_argument('-p', '--pandoc',
     action='store_true',
-    help='Pipe output of scraper into Pandoc. Pandoc must be in the path.')
+    help="""Pipe output of scraper into Pandoc. Pandoc must be in the
+        system PATH.""")
+parser.add_argument('-v', '--verbose',
+    help='Verbose output',
+    action='store_true')
+parser.add_argument('-d', '--debug',
+    help='Debug output',
+    action='store_true')
 args = parser.parse_args()
+
+
+if args.debug:
+    logging.basicConfig(level=logging.DEBUG)
+elif args.verbose:
+    logging.basicConfig(level=logging.INFO)
+
 
 if args.pandoc:
     if args.output:
@@ -42,19 +64,21 @@ if args.pandoc:
         stdin=subprocess.PIPE,
         stderr=sys.stderr,
         stdout=sys.stdout)
-    
+
     output = pandoc.stdin
 elif args.output:
     output = open(args.output, 'wb')
 else:
     output = sys.stdout.buffer
 
-url = args.url
+
+url = args.URL
 domain = urlparse(url).netloc
 domain = re.sub(r'^www\.', '', domain)
 spider = scraper.spiders[domain]()
 spider.crawl(url, output)
 output.close()
+
 
 if args.pandoc:
     pandoc.wait()
