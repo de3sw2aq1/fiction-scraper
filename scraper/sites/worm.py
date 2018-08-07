@@ -40,6 +40,7 @@ def blockquotes(root):
 
 
 class Worm(Spider):
+    name = 'Worm'
     domain = 'parahumans.wordpress.com'
     url = 'https://parahumans.wordpress.com/'
     filters = [scene_breaks, blockquotes, filters.kill_classes, *filters.DEFAULT_FILTERS]

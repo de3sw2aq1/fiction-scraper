@@ -17,11 +17,11 @@ class Spider(ABC):
     filters = filters.DEFAULT_FILTERS
 
     @property
+    @abstractmethod
     def name(self):
         """The spider name.
 
-        Defaults to the class name of the Spider subclass. A subclass may
-        override this property with a better human readable name.
+        The name or description of the stories this spider crawls.
         """
         return self.__class__.__name__
 

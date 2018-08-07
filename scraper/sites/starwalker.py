@@ -19,6 +19,7 @@ def heading(level, text, **kwargs):
 
 
 class Starwalker(Spider):
+    name = 'Starwalker'
     domain = 'starwalkerblog.com'
     url = 'http://www.starwalkerblog.com/'
     filters = [filters.kill_classes, *filters.DEFAULT_FILTERS]
