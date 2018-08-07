@@ -6,16 +6,55 @@ import os
 import logging
 import re
 from urllib.parse import urlparse
+import sys
+import subprocess
 
-LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
-logging.basicConfig(level=LOGLEVEL)
+DEFAULT_PANDOC_ARGS = (
+    'pandoc',
+    '-f', 'html',
+    '--standalone',
+    '--epub-chapter-level', '3')
+
+
+loglevel = os.environ.get('LOGLEVEL', 'WARNING').upper()
+logging.basicConfig(level=loglevel)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("url")
+parser.add_argument('url',
+    help='URL of story to download.')
+parser.add_argument('-o', '--output',
+    default=None,
+    help="""Output file to write story to. If using Pandoc, the specified
+        extension will be used to select the output format. Otherwise
+        include the .html extension.""")
+parser.add_argument('-p', '--pandoc',
+    action='store_true',
+    help='Pipe output of scraper into Pandoc. Pandoc must be in the path.')
 args = parser.parse_args()
+
+if args.pandoc:
+    if args.output:
+        pandoc_args = [*DEFAULT_PANDOC_ARGS, '-o', args.output]
+    else:
+        pandoc_args = [*DEFAULT_PANDOC_ARGS]
+
+    pandoc = subprocess.Popen(pandoc_args,
+        stdin=subprocess.PIPE,
+        stderr=sys.stderr,
+        stdout=sys.stdout)
+    
+    output = pandoc.stdin
+elif args.output:
+    output = open(args.output, 'wb')
+else:
+    output = sys.stdout.buffer
 
 url = args.url
 domain = urlparse(url).netloc
 domain = re.sub(r'^www\.', '', domain)
 spider = scraper.spiders[domain]()
-print(spider.crawl(url))
+spider.crawl(url, output)
+output.close()
+
+if args.pandoc:
+    pandoc.wait()

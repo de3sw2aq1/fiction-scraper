@@ -40,7 +40,7 @@ class Spider(ABC):
         doc.make_links_absolute()
         return doc
 
-    def crawl(self, url):
+    def crawl(self, url, output_file=None):
         # Clear metadata in case story is being re-crawled
         self.metadata = {}
 
@@ -58,8 +58,19 @@ class Spider(ABC):
 
         doc = E.HTML(head, body)
 
-        self.debug('tostring on document...')
-        return tostring(doc, encoding='unicode', pretty_print=True, doctype='<!doctype html>')
+        if output_file:
+            self.debug('writing document...')
+            return doc.getroottree().write(output_file,
+                encoding='utf-8',
+                method='html',
+                pretty_print=True,
+                doctype='<!doctype html>')
+        else:
+            self.debug('tostring on document...')
+            return tostring(doc,
+                encoding='unicode',
+                pretty_print=True,
+                doctype='<!doctype html>')
     
     def debug(self, *args, **kwargs):
         self._logger.debug(*args, **kwargs)
