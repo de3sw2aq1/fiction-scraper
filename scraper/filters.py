@@ -113,7 +113,7 @@ def text_decoration(root, decorations=None):
                 e.classes.add(css_class)
 
 
-def move_attrs_to_div(root, elements=('p',)):
+def move_attrs_to_div(root, elements=('p', 'hr')):
     """If an element has attributes move them to a <div> wrapping it.
 
     Pandoc doesn't support attributes on all types of elements. Notably it
