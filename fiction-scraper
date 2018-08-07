@@ -31,14 +31,13 @@ parser.add_argument('URL',
     help='URL of story to download')
 parser.add_argument('-o', '--output',
     default=None,
-    help="""Output file for the story. If using Pandoc, the specified
-        extension will be used to select the output format. Otherwise
-        include the .html extension. If omitted the HTML will be written to
-        standard output.""")
-parser.add_argument('-p', '--pandoc',
+    help="""Output file for the story. Unless Pandoc is disabled, the story
+        will be postprocesed using Pandoc. Pandoc will autodetect the output
+        file format from the file extension. If omitted, HTML will be written
+        to standard output.""")
+parser.add_argument('-p', '--no-pandoc',
     action='store_true',
-    help="""Pipe output of scraper into Pandoc. Pandoc must be in the
-        system PATH.""")
+    help="""Don't postprocess story with Pandoc, HTML output only""")
 parser.add_argument('-v', '--verbose',
     help='Verbose output',
     action='store_true')
@@ -54,11 +53,11 @@ elif args.verbose:
     logging.basicConfig(level=logging.INFO)
 
 
-if args.pandoc:
+if not args.no_pandoc:
     if args.output:
         pandoc_args = [*DEFAULT_PANDOC_ARGS, '-o', args.output]
     else:
-        pandoc_args = [*DEFAULT_PANDOC_ARGS]
+        pandoc_args = DEFAULT_PANDOC_ARGS
 
     pandoc = subprocess.Popen(pandoc_args,
         stdin=subprocess.PIPE,
@@ -80,5 +79,5 @@ spider.crawl(url, output)
 output.close()
 
 
-if args.pandoc:
+if not args.no_pandoc:
     pandoc.wait()

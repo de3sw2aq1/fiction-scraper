@@ -9,7 +9,7 @@
 Use it something like this:
 
 ```
-$ ./fiction-scraper --pandoc -o ra.epub https://qntm.org/ra
+$ ./fiction-scraper -o ra.epub https://qntm.org/ra
 ```
 
 Or here's the full usage info:
@@ -25,12 +25,12 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -o OUTPUT, --output OUTPUT
-                        Output file for the story. If using Pandoc, the
-                        specified extension will be used to select the output
-                        format. Otherwise include the .html extension. If
-                        omitted the HTML will be written to standard output.
-  -p, --pandoc          Pipe output of scraper into Pandoc. Pandoc must be in
-                        the system PATH.
+                        Output file for the story. Unless Pandoc is disabled,
+                        the story will be postprocesed using Pandoc. Pandoc
+                        will autodetect the output file format from the file
+                        extension. If omitted, HTML will be written to
+                        standard output.
+  -p, --no-pandoc       Don't postprocess story with Pandoc, HTML output only
   -v, --verbose         Verbose output
   -d, --debug           Debug output
 
@@ -51,7 +51,7 @@ If requ need Kindle version of your ebook in .mobi format, you need to use an ex
 
 ## Installation
 
-First [install poetry], then from this directory just run:
+First [install Poetry] and [Pandoc], then from this directory just run:
 
 ```
 $ poetry install
@@ -61,7 +61,7 @@ You must run `fiction-scraper` you must from inside the virtualenv:
 
 ```
 $ poetry shell
-$ ./fiction-scraper --pandoc -o ra.epub https://qntm.org/ra
+$ ./fiction-scraper -o ra.epub https://qntm.org/ra
 ```
 
 I may get around to writing a setup.py and removing the poetry dependency for users if enough people use this.
@@ -72,4 +72,5 @@ All code is MIT licensed. But most of the downloaded stories are not! Stories do
 
 [Calibre]: https://calibre-ebook.com/
 [kindlegen]: https://www.amazon.com/gp/feature.html?docId=1000765211
-[install poetry]: https://github.com/sdispater/poetry#installation
+[install Poetry]: https://github.com/sdispater/poetry#installation
+[Pandoc]: https://pandoc.org/
