@@ -1,8 +1,4 @@
 from abc import ABC, abstractmethod
-import os
-import sys
-import tempfile
-from pathlib import Path
 import logging
 
 from lxml.html import document_fromstring, tostring, builder as E
@@ -12,7 +8,7 @@ from . import filters
 
 
 class Spider(ABC):
-    def __init__(self, *args):
+    def __init__(self):
         super().__init__()
         self._session = requests.session()
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -57,6 +53,8 @@ class Spider(ABC):
         URL.
 
         Typically a spider is implemented as a generator yielding elements.
+        During parsing the spider may write metadata to the `self.metadata`
+        dict.
         """
         pass
 
@@ -86,40 +84,40 @@ class Spider(ABC):
         self.info('beginning parse...')
         body = E.BODY(*self.parse(url))
 
-        self.debug('applying filters...')
+        self.info('applying filters...')
         for f in self.filters:
             self.debug('running filter %s', self._filter_name(f))
             f(body)
 
         # parse() must be called before metadata is accessed, or it may not be
-        # populated yet. 
+        # populated yet.
         head = E.HEAD(*self._generate_meadata_elements())
 
         doc = E.HTML(head, body)
 
         if output_file:
-            self.debug('writing document...')
+            self.info('writing document...')
             return doc.getroottree().write(output_file,
-                encoding='utf-8',
+                encoding='UTF-8',
                 method='html',
                 pretty_print=True,
                 doctype='<!doctype html>')
-        else:
-            self.debug('tostring on document...')
-            return tostring(doc,
-                encoding='unicode',
-                pretty_print=True,
-                doctype='<!doctype html>')
-    
+
+        self.info('tostring on document...')
+        return tostring(doc,
+            encoding='unicode',
+            pretty_print=True,
+            doctype='<!doctype html>')
+
     def debug(self, *args, **kwargs):
         self._logger.debug(*args, **kwargs)
 
     def info(self, *args, **kwargs):
         self._logger.info(*args, **kwargs)
-    
+
     def warning(self, *args, **kwargs):
         self._logger.warning(*args, **kwargs)
-    
+
     def critical(self, *args, **kwargs):
         self._logger.critical(*args, **kwargs)
 
