@@ -44,11 +44,12 @@ class Spider(ABC):
         # Clear metadata in case story is being re-crawled
         self.metadata = {}
 
-        self.info('beginning parse')
+        self.info('beginning parse...')
         body = E.BODY(*self.parse(url))
 
-        self.info('applying filters')
+        self.debug('applying filters...')
         for f in self.filters:
+            self.debug('running filter %s', self._filter_name(f))
             f(body)
 
         # parse() must be called before metadata is accessed, or it may not be
@@ -57,7 +58,7 @@ class Spider(ABC):
 
         doc = E.HTML(head, body)
 
-        self.info('tostring on document')
+        self.debug('tostring on document...')
         return tostring(doc, encoding='unicode', pretty_print=True, doctype='<!doctype html>')
     
     def debug(self, *args, **kwargs):
@@ -83,3 +84,9 @@ class Spider(ABC):
                 yield E.TITLE(content)
             else:
                 yield E.META(name=name, content=content)
+
+    @staticmethod
+    def _filter_name(type_):
+        if not hasattr(type_, '__qualname__'):
+            type_ = type(type_)
+        return type_.__module__ + '.' + type_.__qualname__
