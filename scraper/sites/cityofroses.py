@@ -14,7 +14,9 @@ def scene_breaks(root):
 
 
 class Cityofroses(Spider):
+    name = "City of Roses"
     domain = 'thecityofroses.com'
+    url = 'http://thecityofroses.com/'
     filters = (scene_breaks, *filters.DEFAULT_FILTERS)
 
     def parse(self, url):

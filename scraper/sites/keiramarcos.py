@@ -25,7 +25,9 @@ def scene_breaks(root):
 
 
 class Keiramarcos(Spider):
+    name = 'Keira Marcos fanfiction'
     domain = 'keiramarcos.com'
+    url = 'http://keiramarcos.com/fan-fiction/harry-potter-the-soulmate-bond/'
     filters = (filters.kill_classes, Cleaner(), scene_breaks, *filters.DEFAULT_FILTERS)
 
     def parse(self, url):

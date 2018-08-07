@@ -48,7 +48,9 @@ def heading(level, text, **kwargs):
 
 
 class Qntm(Spider):
+    name = 'Sam Huges fiction'
     domain = 'qntm.org'
+    url = 'https://qntm.org/ra'
     filters = (
         scene_breaks,
         filters.text_alignment,

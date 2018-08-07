@@ -21,12 +21,43 @@ class Spider(ABC):
     filters = filters.DEFAULT_FILTERS
 
     @property
+    def name(self):
+        """The spider name.
+
+        Defaults to the class name of the Spider subclass. A subclass may
+        override this property with a better human readable name.
+        """
+        return self.__class__.__name__
+
+    @property
     @abstractmethod
     def domain(self):
+        """Any URL matching this domain will be crawled with this spider.
+
+        Any leading www. is stripped from the domain before matching.
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def url(self):
+        """A sample URL of a story that may be scraped with this spider.
+
+        This URL is primarily used in in the usage help text, but a spider
+        may also use it internally.
+        """
         pass
 
     @abstractmethod
     def parse(self, url):
+        """Parse the specified URL into an iterable of lxml HTML elements.
+
+        If the spider only scrapes a single story, not multiple stories at the
+        same domain, it may ignore the specified URL and parse a hardcoded
+        URL.
+
+        Typically a spider is implemented as a generator yielding elements.
+        """
         pass
 
     def fetch(self, url):
@@ -41,6 +72,14 @@ class Spider(ABC):
         return doc
 
     def crawl(self, url, output_file=None):
+        """Crawl the specified URL.
+
+        If an output file is specified the serialized HTML output will be
+        written to it. The file may be a file-like object or a filename.
+
+        If an output file is not specified, the HTML output will be returned
+        as a string.
+        """
         # Clear metadata in case story is being re-crawled
         self.metadata = {}
 

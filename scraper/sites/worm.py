@@ -8,8 +8,6 @@ import re
 from lxml.html import builder as E
 from .. import Spider, filters
 
-START_URL = 'https://parahumans.wordpress.com/'
-
 
 # TODO: add stylesheet to draw box for <hr>
 def scene_breaks(root):
@@ -43,10 +41,11 @@ def blockquotes(root):
 
 class Worm(Spider):
     domain = 'parahumans.wordpress.com'
+    url = 'https://parahumans.wordpress.com/'
     filters = [scene_breaks, blockquotes, filters.kill_classes, *filters.DEFAULT_FILTERS]
 
     def parse(self, url):
-        doc = self.fetch(START_URL)
+        doc = self.fetch(self.url)
 
         self.metadata['title'] = 'Worm'
         self.metadata['author'] = 'Wildbow'
