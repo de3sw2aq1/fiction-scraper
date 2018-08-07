@@ -8,9 +8,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.6"
 lxml = "^4.2"
-PyYAML = "^3.13"
 requests = "^2.19"
 cssselect = "^1.0"
 
 [tool.poetry.dev-dependencies]
-pylint = "^2.0"
