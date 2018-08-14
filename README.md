@@ -45,7 +45,7 @@ Suppported sites and sample URLs:
 Note, some sites may have multiple stories at additional URLs.
 ```
 
-`fiction-scraper` may be able to download specific "book" or section of a site instead of the entrire story if you pass it the book's URL.
+`fiction-scraper` may be able to download specific "book" or section of a site instead of the entrire story if you pass it the book's URL instead of the site root.
 
 If requ need Kindle version of your ebook in .mobi format, you need to use an external tool. [Calibre] or [kindlegen] should be able to process the EPUB files created with Pandoc.
 
