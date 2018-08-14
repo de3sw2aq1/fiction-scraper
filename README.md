@@ -66,6 +66,14 @@ $ ./fiction-scraper -o ra.epub https://qntm.org/ra
 
 I may get around to writing a setup.py and removing the poetry dependency for users if enough people use this.
 
+## Supported Sites
+
+*  [City of Roses](http://thecityofroses.com/) 
+*  Any [Keira Marcos fanfiction](http://keiramarcos.com/fan-fiction/)
+*  [Sam Huges's (qntm.org) fiction](https://qntm.org/fiction)
+*  [Starwalker](http://www.starwalkerblog.com/) by Melanie Edmonds
+*  [Worm](https://parahumans.wordpress.com/) by John McCrae, a.k.a. Wildbow
+
 ## License
 
 All code is MIT licensed. But most of the downloaded stories are not! Stories downloaded with `fiction-scraper` should not be freely distributed without permission of their author.
