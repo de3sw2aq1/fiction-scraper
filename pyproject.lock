@@ -1,56 +1,56 @@
 [[package]]
-category = "main"
-description = "Python package for providing Mozilla's CA Bundle."
 name = "certifi"
+version = "2022.12.7"
+description = "Python package for providing Mozilla's CA Bundle."
+category = "main"
 optional = false
-platform = "*"
-python-versions = "*"
-version = "2018.4.16"
+python-versions = ">=3.6"
 
 [[package]]
-category = "main"
-description = "Universal encoding detector for Python 2 and 3"
 name = "chardet"
-optional = false
-platform = "*"
-python-versions = "*"
 version = "3.0.4"
+description = "Universal encoding detector for Python 2 and 3"
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
-category = "main"
-description = "cssselect parses CSS3 Selectors and translates them to XPath 1.0"
 name = "cssselect"
-optional = false
-platform = "*"
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "1.0.3"
+description = "cssselect parses CSS3 Selectors and translates them to XPath 1.0"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
-category = "main"
-description = "Internationalized Domain Names in Applications (IDNA)"
 name = "idna"
-optional = false
-platform = "*"
-python-versions = "*"
 version = "2.7"
-
-[[package]]
+description = "Internationalized Domain Names in Applications (IDNA)"
 category = "main"
-description = "Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API."
-name = "lxml"
 optional = false
-platform = "*"
 python-versions = "*"
-version = "4.2.4"
 
 [[package]]
+name = "lxml"
+version = "4.2.4"
+description = "Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API."
 category = "main"
-description = "Python HTTP for Humans."
-name = "requests"
 optional = false
-platform = "*"
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = "*"
+
+[package.extras]
+cssselect = ["cssselect (>=0.7)"]
+html5 = ["html5lib"]
+htmlsoup = ["BeautifulSoup4"]
+source = ["Cython (>=0.26.1)"]
+
+[[package]]
+name = "requests"
 version = "2.19.1"
+description = "Python HTTP for Humans."
+category = "main"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [package.dependencies]
 certifi = ">=2017.4.17"
@@ -58,25 +58,81 @@ chardet = ">=3.0.2,<3.1.0"
 idna = ">=2.5,<2.8"
 urllib3 = ">=1.21.1,<1.24"
 
+[package.extras]
+security = ["cryptography (>=1.3.4)", "idna (>=2.0.0)", "pyOpenSSL (>=0.14)"]
+socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
+
 [[package]]
-category = "main"
-description = "HTTP library with thread-safe connection pooling, file post, and more."
 name = "urllib3"
-optional = false
-platform = "*"
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
 version = "1.23"
+description = "HTTP library with thread-safe connection pooling, file post, and more."
+category = "main"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
+
+[package.extras]
+secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "ipaddress", "pyOpenSSL (>=0.14)", "pyOpenSSL (>=0.14,<18.0.0)"]
+socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [metadata]
-content-hash = "47939db402042aa524b41a5ecf09dfc5a986647d88b9dfb3706039b306bfa333"
-platform = "*"
+lock-version = "1.1"
 python-versions = "^3.6"
+content-hash = "47939db402042aa524b41a5ecf09dfc5a986647d88b9dfb3706039b306bfa333"
 
-[metadata.hashes]
-certifi = ["13e698f54293db9f89122b0581843a782ad0934a4fe0172d2a980ba77fc61bb7", "9fa520c1bacfb634fa7af20a76bcbd3d5fb390481724c597da32c719a7dca4b0"]
-chardet = ["84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae", "fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"]
-cssselect = ["066d8bc5229af09617e24b3ca4d52f1f9092d9e061931f4184cd572885c23204", "3b5103e8789da9e936a68d993b70df732d06b8bb9a337a05ed4eb52c17ef7206"]
-idna = ["156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e", "684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16"]
-lxml = ["0cf1eca0652c4409e0655e04b840d6d85b7eb18718f5fba3862acad5500e3480", "10624ef1b468252309f269b13af4f837e3a82be366b5f3e49b0e83f1ad66205f", "1259e374da3a575615fe402e0966c5894bae3d2e229c2239ba4ebf2bb020c4b6", "26bb748af1ead0097eb8272b8a06f15a0015b8f312eef772a95f223a16e7de56", "27d0b13bcfcf2f6a5664e64fc3d684c76db1cdba5a5761795d154063559e0b59", "2b013fdabcbc21bc2770437099b921ec290235752b5baaac7a601f75094a378d", "2e469ea2c0b722b9b393187649e7d126c537a68512fc92a676fe86e57050c2a9", "37f7c2cdf513a0ea239c1609681880fb2f0073de0d2996e0ae9a7f0ef15d8b95", "68c6afc7a4411db2df28307e2493c945cb3d887e8f431b81811c1ea6ba087b8b", "73fe3452fc02c0b418914f842f897bdad0f1184368d8d9c315294ff7b94946f2", "7584d83d7315f641510e5f97f4d636ea225fd76e3f8aee965b2e8c93a8169b4d", "76e3ec6b26b1198dd5e6e20539d8360dcd3b224cd80cadba9307b790fda79161", "8288a889cbaa446e5fa168837456e63098b91953c89e5857968a5091b337cdca", "ad9e1fee284dec97b74cd88e925eca1575145598c974243cfb5e859f406adc32", "b360c3769cf0fd7d82577e40e37d4caf693f67744d0d61d11d66b5c31eaccf7a", "c4aaf320284a2713428163bae0e7df0db3b489237ab4830179210a12d56d3068", "c530274e43b0f376cd94e8e0a3e6ea28de1739ec4326689bdbf626e172d2e614", "ca4e79294fd0f3f9e0e5a4c309df84b5f2abc62349bfaf2aaf8965e5108ef8e2", "ce2dc5a104e885abbd48d0cc92ae74afa1d685ee65d6e3497067207d6a26e177", "d295cac30d3e13e82473081ea7df2a11352b5625cb54187fcd5a8be5d9ebf315", "d498338b39c4757ba88bdc705b3a0647d18554856cd2d394ac3bb919ac890c9d", "d537f8e613074805e17039e345edaa822534f66f07d315c89cff9824aa996d65", "df8ba3f52ef59a553b0e94593ea526c34faa4f531c1ab7f5ca7f392bc770c9e3", "e2553800d2d461a2dc329682d0a9068f238ec11d763e5454c61c4df7a0346ed2", "e2afbe403090f5893e254958d02875e0732975e73c4c0cdd33c1f009a61963ca", "e740efa625883f3c4de20c7e1411228d7ce2ab47b9e874a703f6681ec0558a30", "ec7864b62da0f5ae44973351247f2250a25b9b544fc6aff8bd6a75da1156cc70", "f26ddab491b10279b7e8e3fdcbaaaba3ab282fbaecfa48a19874dfc4d53b9d4f", "f6a16681f30918521066ddcc4ba79c1e033c9837dd94f78f5a9f6110e7572185", "f968623ac9b81a6253d4bbbe3f4d1e6be5f33707f397b566935783511bfa281a"]
-requests = ["63b52e3c866428a224f97cab011de738c36aec0185aa91cfacd418b5d58911d1", "ec22d826a36ed72a7358ff3fe56cbd4ba69dd7a6718ffd450ff0e9df7a47ce6a"]
-urllib3 = ["a68ac5e15e76e7e5dd2b8f94007233e01effe3e50e8daddf69acfd81cb686baf", "b5725a0bd4ba422ab0e66e89e030c806576753ea3ee08554382c14e685d117b5"]
+[metadata.files]
+certifi = [
+    {file = "certifi-2022.12.7-py3-none-any.whl", hash = "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18"},
+    {file = "certifi-2022.12.7.tar.gz", hash = "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3"},
+]
+chardet = [
+    {file = "chardet-3.0.4-py2.py3-none-any.whl", hash = "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"},
+    {file = "chardet-3.0.4.tar.gz", hash = "sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae"},
+]
+cssselect = [
+    {file = "cssselect-1.0.3-py2.py3-none-any.whl", hash = "sha256:3b5103e8789da9e936a68d993b70df732d06b8bb9a337a05ed4eb52c17ef7206"},
+    {file = "cssselect-1.0.3.tar.gz", hash = "sha256:066d8bc5229af09617e24b3ca4d52f1f9092d9e061931f4184cd572885c23204"},
+]
+idna = [
+    {file = "idna-2.7-py2.py3-none-any.whl", hash = "sha256:156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e"},
+    {file = "idna-2.7.tar.gz", hash = "sha256:684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16"},
+]
+lxml = [
+    {file = "lxml-4.2.4-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:37f7c2cdf513a0ea239c1609681880fb2f0073de0d2996e0ae9a7f0ef15d8b95"},
+    {file = "lxml-4.2.4-cp27-cp27m-manylinux1_i686.whl", hash = "sha256:e740efa625883f3c4de20c7e1411228d7ce2ab47b9e874a703f6681ec0558a30"},
+    {file = "lxml-4.2.4-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:df8ba3f52ef59a553b0e94593ea526c34faa4f531c1ab7f5ca7f392bc770c9e3"},
+    {file = "lxml-4.2.4-cp27-cp27m-win32.whl", hash = "sha256:ad9e1fee284dec97b74cd88e925eca1575145598c974243cfb5e859f406adc32"},
+    {file = "lxml-4.2.4-cp27-cp27m-win_amd64.whl", hash = "sha256:b360c3769cf0fd7d82577e40e37d4caf693f67744d0d61d11d66b5c31eaccf7a"},
+    {file = "lxml-4.2.4-cp27-cp27mu-manylinux1_i686.whl", hash = "sha256:ce2dc5a104e885abbd48d0cc92ae74afa1d685ee65d6e3497067207d6a26e177"},
+    {file = "lxml-4.2.4-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:68c6afc7a4411db2df28307e2493c945cb3d887e8f431b81811c1ea6ba087b8b"},
+    {file = "lxml-4.2.4-cp33-cp33m-win32.whl", hash = "sha256:73fe3452fc02c0b418914f842f897bdad0f1184368d8d9c315294ff7b94946f2"},
+    {file = "lxml-4.2.4-cp33-cp33m-win_amd64.whl", hash = "sha256:1259e374da3a575615fe402e0966c5894bae3d2e229c2239ba4ebf2bb020c4b6"},
+    {file = "lxml-4.2.4-cp34-cp34m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:c4aaf320284a2713428163bae0e7df0db3b489237ab4830179210a12d56d3068"},
+    {file = "lxml-4.2.4-cp34-cp34m-manylinux1_i686.whl", hash = "sha256:27d0b13bcfcf2f6a5664e64fc3d684c76db1cdba5a5761795d154063559e0b59"},
+    {file = "lxml-4.2.4-cp34-cp34m-manylinux1_x86_64.whl", hash = "sha256:f26ddab491b10279b7e8e3fdcbaaaba3ab282fbaecfa48a19874dfc4d53b9d4f"},
+    {file = "lxml-4.2.4-cp34-cp34m-win32.whl", hash = "sha256:ca4e79294fd0f3f9e0e5a4c309df84b5f2abc62349bfaf2aaf8965e5108ef8e2"},
+    {file = "lxml-4.2.4-cp34-cp34m-win_amd64.whl", hash = "sha256:e2553800d2d461a2dc329682d0a9068f238ec11d763e5454c61c4df7a0346ed2"},
+    {file = "lxml-4.2.4-cp35-cp35m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:10624ef1b468252309f269b13af4f837e3a82be366b5f3e49b0e83f1ad66205f"},
+    {file = "lxml-4.2.4-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:f6a16681f30918521066ddcc4ba79c1e033c9837dd94f78f5a9f6110e7572185"},
+    {file = "lxml-4.2.4-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:26bb748af1ead0097eb8272b8a06f15a0015b8f312eef772a95f223a16e7de56"},
+    {file = "lxml-4.2.4-cp35-cp35m-win32.whl", hash = "sha256:8288a889cbaa446e5fa168837456e63098b91953c89e5857968a5091b337cdca"},
+    {file = "lxml-4.2.4-cp35-cp35m-win_amd64.whl", hash = "sha256:d295cac30d3e13e82473081ea7df2a11352b5625cb54187fcd5a8be5d9ebf315"},
+    {file = "lxml-4.2.4-cp36-cp36m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:7584d83d7315f641510e5f97f4d636ea225fd76e3f8aee965b2e8c93a8169b4d"},
+    {file = "lxml-4.2.4-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:0cf1eca0652c4409e0655e04b840d6d85b7eb18718f5fba3862acad5500e3480"},
+    {file = "lxml-4.2.4-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:2b013fdabcbc21bc2770437099b921ec290235752b5baaac7a601f75094a378d"},
+    {file = "lxml-4.2.4-cp36-cp36m-win32.whl", hash = "sha256:d498338b39c4757ba88bdc705b3a0647d18554856cd2d394ac3bb919ac890c9d"},
+    {file = "lxml-4.2.4-cp36-cp36m-win_amd64.whl", hash = "sha256:d537f8e613074805e17039e345edaa822534f66f07d315c89cff9824aa996d65"},
+    {file = "lxml-4.2.4-cp37-cp37m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:ec7864b62da0f5ae44973351247f2250a25b9b544fc6aff8bd6a75da1156cc70"},
+    {file = "lxml-4.2.4-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:f968623ac9b81a6253d4bbbe3f4d1e6be5f33707f397b566935783511bfa281a"},
+    {file = "lxml-4.2.4-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:76e3ec6b26b1198dd5e6e20539d8360dcd3b224cd80cadba9307b790fda79161"},
+    {file = "lxml-4.2.4-cp37-cp37m-win32.whl", hash = "sha256:c530274e43b0f376cd94e8e0a3e6ea28de1739ec4326689bdbf626e172d2e614"},
+    {file = "lxml-4.2.4-cp37-cp37m-win_amd64.whl", hash = "sha256:2e469ea2c0b722b9b393187649e7d126c537a68512fc92a676fe86e57050c2a9"},
+    {file = "lxml-4.2.4.tar.gz", hash = "sha256:e2afbe403090f5893e254958d02875e0732975e73c4c0cdd33c1f009a61963ca"},
+]
+requests = [
+    {file = "requests-2.19.1-py2.py3-none-any.whl", hash = "sha256:63b52e3c866428a224f97cab011de738c36aec0185aa91cfacd418b5d58911d1"},
+    {file = "requests-2.19.1.tar.gz", hash = "sha256:ec22d826a36ed72a7358ff3fe56cbd4ba69dd7a6718ffd450ff0e9df7a47ce6a"},
+]
+urllib3 = [
+    {file = "urllib3-1.23-py2.py3-none-any.whl", hash = "sha256:b5725a0bd4ba422ab0e66e89e030c806576753ea3ee08554382c14e685d117b5"},
+    {file = "urllib3-1.23.tar.gz", hash = "sha256:a68ac5e15e76e7e5dd2b8f94007233e01effe3e50e8daddf69acfd81cb686baf"},
+]
